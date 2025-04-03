@@ -49,7 +49,7 @@ function initial(): ISessionTodo {
 
 const todoActionsKeyboard = new InlineKeyboard()
   .text("add todo", "todo:create").row()
-  .text("my todos", "todo:find-many");
+  .text("my todos", "todo:find-many")
 
 async function createTodoConvo(convo: Conversation, ctx: Context) {
   await ctx.reply("Write Todo!");
@@ -149,9 +149,9 @@ bot.callbackQuery("todo:find-many", async (ctx) => {
       todoInlineKeyboard.text(todo.title, `todo:choose_${todo.id}`).row(),
     );
 
-  return await ctx.reply("choose todo", {
+  return array.length > 1 ? await ctx.reply("choose todo", {
     reply_markup: todoInlineKeyboard,
-  });
+  }) : await ctx.reply("0 todos",{reply_markup: todoActionsKeyboard})
 });
 
 bot.callbackQuery(/^todo:choose_([\w-]+)$/, async (ctx) => {
