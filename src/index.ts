@@ -37,6 +37,8 @@ let array = [] as { title: string; complete: boolean; id: string }[];
 
 const bot = new Bot<CustomGeneralContext>(process.env.TOKEN || "");
 
+// TODO: implemepting interaction with db and auth
+
 bot.use(conversations());
 
 bot.use(session({ initial }));
