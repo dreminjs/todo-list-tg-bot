@@ -46,8 +46,8 @@ function initial(): ISessionTodo {
 }
 
 const todoActionsKeyboard = new InlineKeyboard()
-  .text("add todo", "todo:create")
-  .text("find my todos", "todo:find-many");
+  .text("add todo", "todo:create").row()
+  .text("my todos", "todo:find-many");
 
 async function createTodoConvo(convo: Conversation, ctx: Context) {
   await ctx.reply("Write Todo!");
@@ -162,9 +162,9 @@ bot.callbackQuery(/^todo:choose_([\w-]+)$/, async (ctx) => {
   }
 
   const actionsKeyboard = new InlineKeyboard()
-    .text("edit", `todo:edit_${todoId}`)
-    .text("delete", `todo:delete_${todoId}`)
-    .text("complete", `todo:complete_${todoId}`);
+    .text("edit", `todo:edit_${todoId}`).row()
+    .text("delete", `todo:delete_${todoId}`).row()
+    .text("complete", `todo:complete_${todoId}`).row()
 
   return await ctx.reply(`Вы выбрали: ${choosedTodo.title}`, {
     reply_markup: actionsKeyboard,
