@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String @id @default(uuid())
+  telegramId Int    @unique @map("telegram_id")
+  list       List[]
+
+  @@map("users")
+}
+
+model List {
+  id     String @id @default(uuid())
+  name   String
+  userId String @map("user_id")
+  user   User   @relation(references: [id], fields: [userId])
+  todo   Todo[]
+
+  @@map("folders")
+}
+
+model Todo {
+  id       String  @id @default(uuid())
+  list     List?    @relation(references: [id], fields: [listId])
+  listId   String?  @map("folder_id") 
+  complete Boolean
+  date     DateTime
+  @@map("todos")
+}
