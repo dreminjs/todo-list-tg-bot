@@ -7,7 +7,7 @@ export async function createOne(data: Prisma.ListCreateInput): Promise<List> {
   });
 }
 
-export async function findMany(telegramId: number) {
+export async function findMany(telegramId: number): Promise<List[]> {
   return await prisma.list.findMany({
     where: {
       user: {

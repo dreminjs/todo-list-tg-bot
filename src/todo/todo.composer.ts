@@ -1,7 +1,8 @@
-import { Composer } from "grammy";
+import { Composer, InlineKeyboard } from "grammy";
 import { CustomGeneralContext } from "../shared/interfaces";
 import { mainActionsKeyboard } from "../shared/keyboards/main-actions.keyboard";
-import { editTodoConvo, createTodoConvo } from "./conversations/todo";
+import { editTodoConvo, createTodoConvo, findManyTodoConvo } from "./todo.coversation";
+import { findMany as findManyLists } from "../list/list.service";
 
 export const todos = new Composer<CustomGeneralContext>();
 
@@ -40,20 +41,7 @@ todos.callbackQuery(/^todo:delete_([\w-]+)$/, async (ctx) => {
 });
 
 todos.callbackQuery("todo:find-many", async (ctx) => {
- // const todoInlineKeyboard = new InlineKeyboard();
-
-//   array
-//     .filter((el) => el.complete === false)
-//     .map((todo) =>
-//       todoInlineKeyboard.text(todo.title, `todo:choose_${todo.id}`).row(),
-//     );
-
-//   return array.length > 1
-//     ? await ctx.reply("choose todo", {
-//         reply_markup: todoInlineKeyboard,
-//       })
-//     : await ctx.reply("0 todos", { reply_markup: todoActionsKeyboard });
- await ctx.reply("todos")
+ await ctx.conversation.enter(findManyTodoConvo.name)
 });
 
 todos.callbackQuery(/^todo:choose_([\w-]+)$/, async (ctx) => {
@@ -79,5 +67,5 @@ todos.callbackQuery(/^todo:choose_([\w-]+)$/, async (ctx) => {
 });
 
 todos.callbackQuery("todo:create", async (ctx) => {
-  await ctx.conversation.enter(createTodoConvo.name);
+ return await ctx.conversation.enter(createTodoConvo.name);
 });

@@ -6,7 +6,6 @@ import { registerCommands } from "./commands/start";
 import { registerListModule } from "./list/list.module";
 import { registerTodoModule } from "./todo/todo.module";
 
-
 dotenv.config();
 
 const bot = new Bot<CustomGeneralContext>(process.env.TOKEN || "");

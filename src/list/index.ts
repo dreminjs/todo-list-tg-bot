@@ -1,0 +1,1 @@
+export { findMany } from "./list.service"
