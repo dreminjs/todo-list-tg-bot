@@ -7,12 +7,22 @@ export async function createOne(data: Prisma.ListCreateInput): Promise<List> {
   });
 }
 
-export async function findMany(telegramId: number): Promise<List[]> {
+export async function findMany(args: Prisma.ListFindManyArgs): Promise<List[]> {
   return await prisma.list.findMany({
-    where: {
-      user: {
-        telegramId,
-      },
-    },
+    ...args
   });
 }
+
+export async function deleteOne(args: Prisma.ListDeleteArgs) {
+  return await prisma.list.delete(args)
+}
+
+export const updateOne = async (
+  where: Prisma.ListWhereUniqueInput,
+  data: Prisma.ListUpdateInput,
+): Promise<List> => {
+  return await prisma.list.update({
+    where,
+    data,
+  });
+};

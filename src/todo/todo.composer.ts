@@ -1,21 +1,24 @@
 import { Composer, InlineKeyboard } from "grammy";
-import { CustomGeneralContext } from "../shared/interfaces";
-import { mainActionsKeyboard } from "../shared/keyboards/main-actions.keyboard";
-import { editTodoConvo, createTodoConvo, findManyTodoConvo } from "./todo.coversation";
-import { findMany as findManyLists } from "../list/list.service";
-
+import { CustomGeneralContext } from "../app/shared/interfaces";
+import { mainActionsKeyboard } from "../app/shared/keyboards/main-actions.keyboard";
+import {
+  editTodoConvo,
+  createTodoConvo,
+  findManyTodoConvo,
+} from "./todo.coversation";
+import { deleteOne, findMany, findOne, updateOne } from "./todo.service";
 export const todos = new Composer<CustomGeneralContext>();
 
 todos.callbackQuery(/^todo:complete_([\w-]+)$/, async (ctx) => {
   const todoId = ctx.match[1];
 
-  // const currentTodoIdx = array.findIndex((el) => el.id === todoId);
+  const completedTodo = await updateOne({
+    id: todoId
+  },{
+    complete: true
+  })
 
-  // array[currentTodoIdx].complete = true;
-
- // await ctx.reply(`${array[currentTodoIdx].title} - is complete`);
-
-  await ctx.reply("Choose Action", {
+  await ctx.reply(`${completedTodo.content} - completed! \n Choose Action!`, {
     reply_markup: mainActionsKeyboard,
   });
 });
@@ -27,45 +30,64 @@ todos.callbackQuery(/^todo:edit_([\w-]+)$/, async (ctx) => {
 todos.callbackQuery(/^todo:delete_([\w-]+)$/, async (ctx) => {
   const todoId = ctx.match[1];
 
- // const index = array.findIndex((el) => el.id === todoId);
+  Promise.all([
+    deleteOne({
+      id: todoId,
+    }),
 
- // const deletedTodoTitle = array[index].title;
-
- // array = array.filter((el) => el.id !== todoId);
-
- // await ctx.reply(`${deletedTodoTitle} - deleted task`);
-
-  await ctx.reply("Choose Action", {
-    reply_markup: mainActionsKeyboard,
-  });
+    ctx.reply("Choose Action", {
+      reply_markup: mainActionsKeyboard,
+    }),
+  ]);
 });
 
 todos.callbackQuery("todo:find-many", async (ctx) => {
- await ctx.conversation.enter(findManyTodoConvo.name)
+   await ctx.conversation.enter(findManyTodoConvo.name);
+});
+
+todos.callbackQuery(/^todo:find-many-by_([\w]+)$/, async (ctx) => {
+  const listId = ctx.match[1];
+
+  const todos = await findMany({
+    where: {
+      list: {
+        id: listId,
+      },
+    },
+  });
+
+  const todosInlineKeyboard = new InlineKeyboard();
+
+  todos.forEach((todo) =>
+    todosInlineKeyboard
+      .text(todo.content.padStart(50), `todo:choose_${todo.id}`)
+      .row(),
+  );
 });
 
 todos.callbackQuery(/^todo:choose_([\w-]+)$/, async (ctx) => {
   const todoId = ctx.match[1];
 
-//   const choosedTodo = array.find((el) => el.id === todoId);
+  const choosedTodo = await findOne({
+    where: {
+      id: todoId,
+    },
+  });
 
-//   if (!choosedTodo) {
-//     return await ctx.reply("Ошибка: TODO не найден.");
-//   }
+  const actionsKeyboard = new InlineKeyboard()
+    .text("edit", `todo:edit_${todoId}`)
+    .row()
+    .text("delete", `todo:delete_${todoId}`)
+    .row()
+    .text("complete", `todo:complete_${todoId}`)
+    .row().text("exit","convo:exit")
 
-//   const actionsKeyboard = new InlineKeyboard()
-//     .text("edit", `todo:edit_${todoId}`)
-//     .row()
-//     .text("delete", `todo:delete_${todoId}`)
-//     .row()
-//     .text("complete", `todo:complete_${todoId}`)
-//     .row();
-
-//   return await ctx.reply(`Вы выбрали: ${choosedTodo.title}`, {
-//     reply_markup: actionsKeyboard,
-//   });
+    return await ctx.reply(`Вы выбрали: ${choosedTodo?.content}`, {
+      reply_markup: actionsKeyboard,
+    });
 });
 
 todos.callbackQuery("todo:create", async (ctx) => {
- return await ctx.conversation.enter(createTodoConvo.name);
+  return await ctx.conversation.enter(createTodoConvo.name);
 });
+

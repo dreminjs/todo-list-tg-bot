@@ -1,22 +1,28 @@
 import { Conversation } from "@grammyjs/conversations";
 import { Context, InlineKeyboard } from "grammy";
-import { mainActionsKeyboard } from "../shared/keyboards/main-actions.keyboard";
+import { mainActionsKeyboard } from "../app/shared/keyboards/main-actions.keyboard";
 import { findMany as findManyLists } from "../list";
-import { createOne, findMany } from "./todo.service";
+import { createOne, findMany, updateOne } from "./todo.service";
 
 export async function createTodoConvo(convo: Conversation, ctx: Context) {
   const telegramId = ctx.chat?.id;
 
   if (!telegramId) return;
 
-  const lists = await convo.external(() => findManyLists(telegramId));
+  const lists = await convo.external(() => findManyLists({
+    where:{
+      user:{
+        telegramId,
+      }
+    }
+  }));
 
   const listsInlineKeyboard = new InlineKeyboard();
 
-  lists.forEach((el) => listsInlineKeyboard.text(el.name, el.id).row());
+  lists.forEach((el) => listsInlineKeyboard.text(el.name, el.id).row().row())
 
   await ctx.reply("choose list", {
-    reply_markup: listsInlineKeyboard,
+    reply_markup: listsInlineKeyboard.row().text("exit","convo:exit"),
   });
 
   const {
@@ -65,14 +71,20 @@ export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
 
   if (!telegramId) return;
 
-  const lists = await convo.external(() => findManyLists(telegramId));
+  const lists = await convo.external(() => findManyLists({
+    where:{
+      user:{
+        telegramId
+      }
+    }
+  }));
 
   const listsInlineKeyboard = new InlineKeyboard();
 
-  lists.forEach((list) => listsInlineKeyboard.text(list.name, list.id));
+  lists.forEach((list) => listsInlineKeyboard.text(list.name, list.id).row())
 
   await ctx.reply("choose list", {
-    reply_markup: listsInlineKeyboard,
+    reply_markup: listsInlineKeyboard.text("exit","convo:exit"),
   });
 
   const {
@@ -90,7 +102,7 @@ export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
   const todosInlineKeyboard = new InlineKeyboard();
 
   todos.forEach((todo) =>
-    todosInlineKeyboard.text(todo.content.padStart(50), todo.id),
+    todosInlineKeyboard.text(todo.content.padStart(50), todo.id).row(),
   );
 
   await ctx.reply("choose todo for action", {
@@ -102,9 +114,10 @@ export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
   } = await convo.waitForCallbackQuery([...todos.map((el) => el.id)]);
 
   const todoActionsKeyboard = new InlineKeyboard()
-    .text("complete", `todo:complete_${todoIdCallbackQueryAnswer}`)
-    .text("edit", `todo:edit_${todoIdCallbackQueryAnswer}`)
-    .text("delete", `todo:delete_${todoIdCallbackQueryAnswer}`);
+    .text("complete", `todo:complete_${todoIdCallbackQueryAnswer}`).row()
+    .text("edit", `todo:edit_${todoIdCallbackQueryAnswer}`).row()
+    .text("delete", `todo:delete_${todoIdCallbackQueryAnswer}`).row()
+    .text('exit',"convo:exit")
 
   await ctx.reply(`choose todo actions`, {
     reply_markup: todoActionsKeyboard
@@ -121,14 +134,20 @@ export async function editTodoConvo(
 
   const { message, msgId: messageId, chatId } = await convo.waitFor(":text");
 
-  /// const index = array.findIndex((el) => el.id === todoId);
+  const updatedTodo = await updateOne({id: todoId},{
+    content: message?.text
+  })
 
-  if (!message?.text) return;
-  // array[index].title = message?.text;
-
-  ctx.reply("Something go wrong!");
-
-  // await ctx.reply(`${array[index].title} - new title`);
+  await Promise.all([
+    ctx.api.setMessageReaction(chatId, messageId, [
+      { type: "emoji", emoji: "👍" },
+    ]),
+    ctx.reply(`${updatedTodo.content} - Updated! `, {
+      reply_parameters: {
+        message_id: messageId,
+      },
+    }),
+  ]);
 
   await ctx.reply("Choose Action", {
     reply_markup: mainActionsKeyboard,

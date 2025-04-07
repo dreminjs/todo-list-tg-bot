@@ -1,5 +1,5 @@
 import { Bot, Composer } from "grammy";
-import { CustomGeneralContext } from "../shared/interfaces";
+import { CustomGeneralContext } from "../app/shared/interfaces";
 import { createConversation } from "@grammyjs/conversations";
 import { createTodoConvo, editTodoConvo, findManyTodoConvo } from "./todo.coversation";
 import { todos } from "./todo.composer";

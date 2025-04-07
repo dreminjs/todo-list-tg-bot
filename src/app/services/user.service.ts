@@ -1,4 +1,4 @@
-import { prisma } from "../prisma";
+import { prisma } from "../../prisma";
 
 export async function findOrCreateUser(telegramId: number) {
   return await prisma.user.upsert({
