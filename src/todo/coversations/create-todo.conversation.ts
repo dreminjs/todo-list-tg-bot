@@ -35,8 +35,8 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
     message: title,
     msgId: messageId,
     chatId,
-  } = await convo.waitFor(":text",{
-    otherwise: ctx => ctx.reply("write todo!")
+  } = await convo.waitFor(":text", {
+    otherwise: (ctx) => ctx.reply("write todo!"),
   });
 
   if (!title?.text || !listIdCallbackQueryAnswer) return;
@@ -73,45 +73,43 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
     });
 
     const stepInlineKeyboard = new InlineKeyboard()
-    .text("yes", "step:yes")
-    .text("no", "step:no");
+      .text("yes", "step:yes")
+      .text("no", "step:no");
 
-  await ctx.reply("do wanna add steps", {
-    reply_markup: stepInlineKeyboard,
-  });
+    await ctx.reply("do wanna add steps", {
+      reply_markup: stepInlineKeyboard,
+    });
 
-  const {
-    callbackQuery: { data: stepChoice },
-  } = await convo.waitForCallbackQuery(["step:yes", "step:no"]);
+    const {
+      callbackQuery: { data: stepChoice },
+    } = await convo.waitForCallbackQuery(["step:yes", "step:no"]);
 
-  let isUserWantsToAddSteps = false;
-  
-  if(stepChoice === "step:yes"){
+    let isUserWantsToAddSteps = false;
 
-    const {message: newStep } = await convo.waitFor(":text",{
-      otherwise: ctx => ctx.reply("write new step!")
-    })
-    
-    if(!newStep?.text) return;
+    if (stepChoice === "step:yes") {
+      const { message: newStep } = await convo.waitFor(":text", {
+        otherwise: (ctx) => ctx.reply("write new step!"),
+      });
 
-    await createOneStep({
-      content: newStep!.text,
-      todo: {
-        create: undefined,
-      }
-    })
+      if (!newStep?.text) return;
 
-    isUserWantsToAddSteps = true
+      await createOneStep({
+        content: newStep!.text,
+        todo: {
+          create: undefined,
+        },
+      });
+
+      isUserWantsToAddSteps = true;
+    }
+
+    while (isUserWantsToAddSteps) {
+      isUserWantsToAddSteps = false;
+    }
   }
 
-
-  while (isUserWantsToAddSteps) {
-    isUserWantsToAddSteps = false;
-  }
-  }
-
-  const { message: description } = await convo.waitFor(":text",{
-    otherwise: ctx => ctx.reply("Write description!")
+  const { message: description } = await convo.waitFor(":text", {
+    otherwise: (ctx) => ctx.reply("Write description!"),
   });
 
   await handleCreateTodo({
