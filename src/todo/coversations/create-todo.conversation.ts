@@ -71,43 +71,6 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
         },
       },
     });
-
-    const stepInlineKeyboard = new InlineKeyboard()
-    .text("yes", "step:yes")
-    .text("no", "step:no");
-
-  await ctx.reply("do wanna add steps", {
-    reply_markup: stepInlineKeyboard,
-  });
-
-  const {
-    callbackQuery: { data: stepChoice },
-  } = await convo.waitForCallbackQuery(["step:yes", "step:no"]);
-
-  let isUserWantsToAddSteps = false;
-  
-  if(stepChoice === "step:yes"){
-
-    const {message: newStep } = await convo.waitFor(":text",{
-      otherwise: ctx => ctx.reply("write new step!")
-    })
-    
-    if(!newStep?.text) return;
-
-    await createOneStep({
-      content: newStep!.text,
-      todo: {
-        create: undefined,
-      }
-    })
-
-    isUserWantsToAddSteps = true
-  }
-
-
-  while (isUserWantsToAddSteps) {
-    isUserWantsToAddSteps = false;
-  }
   }
 
   const { message: description } = await convo.waitFor(":text",{
