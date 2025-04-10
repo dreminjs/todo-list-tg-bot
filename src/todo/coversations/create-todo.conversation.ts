@@ -3,6 +3,7 @@ import { findMany as findManyLists } from "../../list";
 import { Conversation } from "@grammyjs/conversations";
 import { handleCreateTodo } from "../actions/create-todo.action";
 import { createOne as createOneStep } from "../../step/step.service";
+import { handleEmptyLists } from "../../list/actions/create-list.action";
 
 export async function createTodoConvo(convo: Conversation, ctx: Context) {
   const telegramId = ctx.chat?.id;
@@ -18,6 +19,10 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
       },
     }),
   );
+
+  if (lists.length === 0) {
+   return await handleEmptyLists(ctx)
+   }
 
   const listsInlineKeyboard = new InlineKeyboard();
 

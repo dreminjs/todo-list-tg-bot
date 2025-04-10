@@ -2,27 +2,33 @@ import { Conversation } from "@grammyjs/conversations";
 import { Context, InlineKeyboard } from "grammy";
 import { findMany as findManyLists } from "../../list";
 import { findMany } from "../todo.service";
-
+import { handleEmptyLists } from "../../list/actions/create-list.action";
 
 export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
   const telegramId = ctx.chat?.id;
 
   if (!telegramId) return;
 
-  const lists = await convo.external(() => findManyLists({
-    where:{
-      user:{
-        telegramId
-      }
-    }
-  }));
+  const lists = await convo.external(() =>
+    findManyLists({
+      where: {
+        user: {
+          telegramId,
+        },
+      },
+    }),
+  );
 
   const listsInlineKeyboard = new InlineKeyboard();
 
-  lists.forEach((list) => listsInlineKeyboard.text(list.name, list.id).row())
+  lists.forEach((list) => listsInlineKeyboard.text(list.name, list.id).row());
 
-  await ctx.reply("choose list", {
-    reply_markup: listsInlineKeyboard.text("exit","convo:exit"),
+  if (lists.length === 0) {
+    return await handleEmptyLists(ctx)
+   }
+
+  await ctx.reply("choose list ", {
+    reply_markup: listsInlineKeyboard.text("exit", "convo:exit"),
   });
 
   const {
@@ -37,6 +43,8 @@ export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
     },
   });
 
+
+
   const todosInlineKeyboard = new InlineKeyboard();
 
   todos.forEach((todo) =>
@@ -44,7 +52,7 @@ export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
   );
 
   await ctx.reply("choose todo for action", {
-    reply_markup: todosInlineKeyboard.text("exit","convo:exit"),
+    reply_markup: todosInlineKeyboard.text("exit", "convo:exit"),
   });
 
   const {
@@ -52,14 +60,15 @@ export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
   } = await convo.waitForCallbackQuery([...todos.map((el) => el.id)]);
 
   const todoActionsKeyboard = new InlineKeyboard()
-    .text("complete", `todo:complete_${todoIdCallbackQueryAnswer}`).row()
-    .text("edit", `todo:edit_${todoIdCallbackQueryAnswer}`).row()
-    .text("delete", `todo:delete_${todoIdCallbackQueryAnswer}`).row()
-    .text('exit',"convo:exit")
+    .text("complete", `todo:complete_${todoIdCallbackQueryAnswer}`)
+    .row()
+    .text("edit", `todo:edit_${todoIdCallbackQueryAnswer}`)
+    .row()
+    .text("delete", `todo:delete_${todoIdCallbackQueryAnswer}`)
+    .row()
+    .text("exit", "convo:exit");
 
   await ctx.reply(`choose todo actions`, {
-    reply_markup: todoActionsKeyboard
-  })
-
+    reply_markup: todoActionsKeyboard,
+  });
 }
-
