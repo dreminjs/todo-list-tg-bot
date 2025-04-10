@@ -1,6 +1,6 @@
 import { Bot } from "grammy";
 import { mainActionsKeyboard } from "../shared/keyboards/main-actions.keyboard";
-import { findOrCreateUser } from "../services/user.service";
+import { findOrCreateUser } from "../../user/user.service";
 import { CustomGeneralContext } from "../shared/interfaces";
 
 export function registerCommands(bot: Bot<CustomGeneralContext>) {

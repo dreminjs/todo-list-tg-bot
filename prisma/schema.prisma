@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id         String @id @default(uuid())
+  id         String @id @default(uuid()) @db.Uuid()
   telegramId Int    @unique @map("telegram_id")
   list       List[]
 
@@ -16,22 +16,31 @@ model User {
 }
 
 model List {
-  id     String @id @default(uuid())
+  id     String @id @default(uuid()) @db.Uuid()
   name   String
-  userId String @map("user_id")
-  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id") @db.Uuid()
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   todo   Todo[]
 
   @@map("lists")
 }
 
 model Todo {
-  id       String   @id @default(uuid())
-  listId   String?  @map("list_id")
-  list     List?    @relation(fields: [listId], references: [id])
-  complete Boolean  @default(false)
-  date     DateTime @default(now())
-  content  String
-
+  id          String   @id @default(uuid()) @db.Uuid()
+  listId      String?  @map("list_id") @db.Uuid()
+  list        List?    @relation(fields: [listId], references: [id],onDelete: Cascade)
+  complete    Boolean  @default(false)
+  date        DateTime @default(now())
+  content     String
+  description String?
+  step        Step[]
   @@map("todos")
+}
+
+model Step {
+  id          String   @id @default(uuid()) @db.Uuid()
+  content     String
+  todoId      String   @db.Uuid()
+  todo        Todo     @relation(references: [id],fields: [todoId], onDelete: Cascade)
+  @@map("steps")
 }

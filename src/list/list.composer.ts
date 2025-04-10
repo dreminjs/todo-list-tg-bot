@@ -1,69 +1,19 @@
-import { Composer, InlineKeyboard } from "grammy";
+import { Composer } from "grammy";
 import { CustomGeneralContext } from "../app/shared/interfaces";
-import { createListConvo, editListConvo } from "./list.coversation";
-import { deleteOne, findMany } from "./list.service";
-import { mainActionsKeyboard } from "../app/shared/keyboards/main-actions.keyboard";
+import { editCallback } from "./handlers/callback/edit";
+import { deleteCallback } from "./handlers/callback/delete";
+import { chooseCallback } from "./handlers/callback/choose";
+import { findManyCallback } from "./handlers/callback/find-many";
+import { createCallback } from "./handlers/callback/create";
 
 export const lists = new Composer<CustomGeneralContext>();
 
-lists.callbackQuery("list:create", async (ctx) => {
-  return await ctx.conversation.enter(createListConvo.name);
-});
+lists.callbackQuery("list:create", createCallback);
 
-lists.callbackQuery("list:find-many", async (ctx) => {
-  const listsInlineKeyboard = new InlineKeyboard();
+lists.callbackQuery("list:find-many", findManyCallback);
 
-  const telegramId = ctx.chat?.id;
+lists.callbackQuery(/^list:choose_([\w-]+)$/, chooseCallback);
 
-  if (ctx.chat?.id) {
-    const lists = await findMany({
-      where: {
-        user: {
-          telegramId,
-        },
-      },
-    });
-    lists.forEach((list) => {
-      listsInlineKeyboard.text(list.name, `list:choose_${list.id}`).row();
-    });
-  }
+lists.callbackQuery(/^list:delete_([\w-]+)$/, deleteCallback);
 
-  listsInlineKeyboard.text("exit","convo:exit")
-
-  ctx.reply("Choose list", {
-    reply_markup: listsInlineKeyboard,
-  });
-});
-
-lists.callbackQuery(/^list:choose_([\w-]+)$/, async (ctx) => {
-  const listId = ctx.match[1];
-
-  const listActionsInlineKeyboard = new InlineKeyboard()
-    .text("edit", `list:edit_${listId}`)
-    .text("see all todos", `todo:find-many_${listId}`)
-    .text("delete", `list:delete_${listId}`).row()
-    .text("exit","convo:exit")
-
-  await ctx.reply("choose actions", {
-    reply_markup: listActionsInlineKeyboard,
-  });
-});
-
-lists.callbackQuery(/^list:delete_([\w-]+)$/, async (ctx) => {
-  const listId = ctx.match[1];
-
- const deleteTodo = await deleteOne({
-    where: {
-      id: listId,
-    },
-  });
-
-  return ctx.reply(`${deleteTodo.name} - deleted!`,{
-    reply_markup: mainActionsKeyboard
-  });
-});
-
-
-lists.callbackQuery(/^list:edit_([\w-]+)$/, async (ctx) => {
-  await ctx.conversation.enter(editListConvo.name, ctx.match[1]);
-});
+lists.callbackQuery(/^list:edit_([\w-]+)$/, editCallback);
