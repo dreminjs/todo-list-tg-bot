@@ -1,7 +1,6 @@
 import { Context, InlineKeyboard } from "grammy";
 import { findMany as findManyLists } from "../../list";
 import { Conversation } from "@grammyjs/conversations";
-import { handleCreateTodo } from "../actions/create-todo.action";
 import { handleEmptyLists } from "../../list/actions/create-list.action";
 import { mainActionsKeyboard } from "../../app/shared/keyboards/main-actions.keyboard";
 import { createOne as createOneTodo } from "../todo.service";
@@ -46,11 +45,7 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
 
   await ctx.reply("write todo");
 
-  const {
-    message: title,
-    msgId: messageId,
-    chatId,
-  } = await convo.waitFor(":text");
+  const { message: title } = await convo.waitFor(":text");
 
   if (!title?.text) return;
 
@@ -80,6 +75,11 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
       createOneTodo({
         content: title.text,
         description: description?.text,
+        list: {
+          connect: {
+            id: listIdChoice,
+          },
+        },
       }),
     );
     todoId = todo.id;
@@ -87,6 +87,11 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
     const todo = await convo.external(() =>
       createOneTodo({
         content: title.text,
+        list: {
+          connect: {
+            id: listIdChoice,
+          },
+        },
       }),
     );
 
@@ -113,24 +118,25 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
       });
     }
 
-    await ctx.reply("write step!")
+    await ctx.reply("write step!");
 
     const { message: newStep } = await convo.waitFor(":text");
-    
+
     if (!newStep?.text) return;
 
-    await createOneStep({
-      content: newStep.text,
-      todo: {
-        connect: {
-          id: todoId,
+    await convo.external(() =>
+      createOneStep({
+        content: newStep.text,
+        todo: {
+          connect: {
+            id: todoId,
+          },
         },
-      },
-    });
+      }),
+    );
   }
 
   return await ctx.reply("choose action", {
     reply_markup: mainActionsKeyboard,
   });
-  
 }

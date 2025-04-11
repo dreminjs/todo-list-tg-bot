@@ -11,6 +11,10 @@ export const chooseCallback = async (
     where: {
       id: todoId,
     },
+    include: {
+      step: true,
+      list: true,
+    },
   });
 
   const actionsKeyboard = new InlineKeyboard()
@@ -22,7 +26,11 @@ export const chooseCallback = async (
     .row()
     .text("exit", "convo:exit");
 
-  return await ctx.reply(`Вы выбрали: ${choosedTodo?.content}`, {
+  const textInfo = `name: ${choosedTodo?.content}${
+    choosedTodo?.description ? `\ndescription: ${choosedTodo?.description}` : ""
+  }\ncomplete: ${choosedTodo?.complete ? "✅" : "❌"}\n`;
+
+  return await ctx.reply(`${textInfo}`, {
     reply_markup: actionsKeyboard,
   });
 };
