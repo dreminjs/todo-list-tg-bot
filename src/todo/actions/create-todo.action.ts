@@ -32,7 +32,7 @@ export const handleCreateTodo = async ({
     }),
   );
 
-  await Promise.all([
+   await Promise.all([
     ctx.api.setMessageReaction(chatId, messageId, [
       { type: "emoji", emoji: "👍" },
     ]),
