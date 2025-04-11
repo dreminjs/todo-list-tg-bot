@@ -1,7 +1,6 @@
 import { Conversation } from "@grammyjs/conversations";
 import { createOne } from "../todo.service";
-import { Prisma } from "@prisma/client";
-import { mainActionsKeyboard } from "../../app/shared/keyboards/main-actions.keyboard";
+import { Prisma, Todo } from "@prisma/client";
 import { Context } from "grammy";
 
 interface IArgs {
@@ -18,7 +17,7 @@ export const handleCreateTodo = async ({
   chatId,
   messageId,
   ctx,
-}: IArgs) => {
+}: IArgs): Promise<Todo> => {
   const createdTodo = await convo.external(() =>
     createOne({
       content: createTodoPayload.content,
@@ -33,7 +32,7 @@ export const handleCreateTodo = async ({
     }),
   );
 
-  await Promise.all([
+   await Promise.all([
     ctx.api.setMessageReaction(chatId, messageId, [
       { type: "emoji", emoji: "👍" },
     ]),
@@ -44,7 +43,5 @@ export const handleCreateTodo = async ({
     }),
   ]);
 
-  return await ctx.reply("Choose Action", {
-    reply_markup: mainActionsKeyboard,
-  });
+  return createdTodo
 };
