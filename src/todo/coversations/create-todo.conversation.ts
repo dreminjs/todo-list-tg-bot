@@ -116,7 +116,7 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
     await ctx.reply("write step!")
 
     const { message: newStep } = await convo.waitFor(":text");
-
+    
     if (!newStep?.text) return;
 
     await createOneStep({
@@ -132,4 +132,5 @@ export async function createTodoConvo(convo: Conversation, ctx: Context) {
   return await ctx.reply("choose action", {
     reply_markup: mainActionsKeyboard,
   });
+  
 }
