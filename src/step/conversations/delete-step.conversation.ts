@@ -1,7 +1,7 @@
 import { Conversation } from "@grammyjs/conversations";
 import { Context, InlineKeyboard } from "grammy";
-import { mainActionsKeyboard } from "../../app/shared/keyboards/main-actions.keyboard";
-import { deleteOne } from "../step.service";
+import { deleteOne, findOne } from "../step.service";
+import { handleShowStepActionsKeyboard } from "../keyboards/step-actions.inline-keyboard";
 
 export const deleteStepConvo = async (
   convo: Conversation,
@@ -12,18 +12,28 @@ export const deleteStepConvo = async (
     .text("yes", "step:delete:yes")
     .text("no", "step:delete:no");
 
-  await ctx.reply("confirm deletion",{
-    reply_markup: confirmDeleteInlineKeyboard
-  })   
-
-  const {
-    callbackQuery: { data },
-  } = await convo.waitForCallbackQuery(["step:delete:yes", "step:delete:no"]);
+  await ctx.reply("confirm deletion", {
+    reply_markup: confirmDeleteInlineKeyboard,
+  });
+  const [
+    {
+      callbackQuery: { data },
+    },
+    currentStep,
+  ] = await convo.external(() =>
+    Promise.all([
+      convo.waitForCallbackQuery(["step:delete:yes", "step:delete:no"]),
+      findOne({ id: stepId }),
+    ]),
+  );
 
   if (data == "step:delete:no") {
     await ctx.reply("Deletion is rejected");
     return ctx.reply("Choose Action", {
-      reply_markup: mainActionsKeyboard,
+      reply_markup: handleShowStepActionsKeyboard({
+        stepId,
+        isComplete: Boolean(currentStep?.complete),
+      }),
     });
   }
 
@@ -34,7 +44,10 @@ export const deleteStepConvo = async (
       id: stepId,
     }),
     ctx.reply("Choose Action", {
-      reply_markup: mainActionsKeyboard,
+      reply_markup: handleShowStepActionsKeyboard({
+        stepId,
+        isComplete: Boolean(currentStep?.complete),
+      }),
     }),
   ]);
 };

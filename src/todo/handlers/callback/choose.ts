@@ -1,6 +1,7 @@
 import { CallbackQueryContext, InlineKeyboard } from "grammy";
 import { CustomGeneralContext } from "../../../app/shared/interfaces";
 import { findOne } from "../../todo.service";
+import { handleShowtodoActionsInline } from "../../keyboards/todo-actions.inline-keyboard";
 
 export const chooseCallback = async (
   ctx: CallbackQueryContext<CustomGeneralContext>,
@@ -16,24 +17,17 @@ export const chooseCallback = async (
     },
   });
 
-  const isCompletedLabel = choosedTodo?.complete ? "uncomplete" : "complete"
-
-  const actionsKeyboard = new InlineKeyboard()
-    .text("edit", `todo:edit_${todoId}`)
-    .row()
-    .text("delete", `todo:delete_${todoId}`)
-    .row()
-    .text(isCompletedLabel, `todo:toggle-complete_${todoId}`)
-    .row()
-    .text("see steps",`step:find-many-by-todo-id_${todoId}`)
-    .row()
-    .text("exit", "convo:exit");
+  if(!choosedTodo?.listId) return ctx.reply("no list id!")
 
   const textInfo = `name: ${choosedTodo?.content}${
     choosedTodo?.description ? `\ndescription: ${choosedTodo?.description}` : ""
   }\ncomplete: ${choosedTodo?.complete ? "✅" : "❌"}\n`;
 
   return await ctx.reply(`${textInfo}`, {
-    reply_markup: actionsKeyboard,
+    reply_markup: handleShowtodoActionsInline({
+      isComplete: Boolean(choosedTodo?.complete),
+      todoId,
+      listId: choosedTodo?.listId
+    }),
   });
 };

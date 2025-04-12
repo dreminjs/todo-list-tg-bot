@@ -22,9 +22,9 @@ export const findManyCallback = async (
     listsInlineKeyboard.text(list.name, `list:choose_${list.id}`).row();
   });
 
-  listsInlineKeyboard.text("exit", "convo:exit");
+  listsInlineKeyboard.text("return", "convo:exit");
 
-  ctx.reply("Choose list", {
+  ctx.reply("choose list", {
     reply_markup: listsInlineKeyboard,
   });
 };

@@ -9,6 +9,8 @@ export const chooseCallback = async (
 
   const currentStep = await findOne({ id: stepId });
 
+  if(!currentStep) return ctx.reply("todo id is null!")
+
   const isCompleteLabel = currentStep?.complete ? "uncomplete" : "complete";
 
   const actionsInlineKeyboard = new InlineKeyboard()
@@ -16,7 +18,7 @@ export const chooseCallback = async (
     .text(isCompleteLabel, `step:toggle-complete_${stepId}`).row()
     .text('delete',`step:delete_${stepId}`).row()
     .text("make task",`step:todo:create_${stepId}`).row()
-    .text("exit","convo:exit")
+    .text("exit",`step:find-many-by-todo-id_${currentStep.todoId}`)
 
  return await ctx.reply("choose action for step",{
     reply_markup: actionsInlineKeyboard

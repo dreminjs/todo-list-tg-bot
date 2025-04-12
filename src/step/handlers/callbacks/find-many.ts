@@ -26,7 +26,7 @@ export const findManyCallbackByTodoId = async (
     stepsInlineKeyboard.text(step.content, `step:choose_${step.id}`).row(),
   );
 
-  await ctx.reply("choose step action", {
-    reply_markup: stepsInlineKeyboard,
+  await ctx.reply("choose step for action", {
+    reply_markup: stepsInlineKeyboard.text("return",`todo:choose_${todoId}`),
   });
 };

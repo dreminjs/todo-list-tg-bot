@@ -8,10 +8,12 @@ export const chooseCallback = async (
 
   const listActionsInlineKeyboard = new InlineKeyboard()
     .text("edit", `list:edit_${listId}`)
-    .text("see all todos", `todo:find-many_${listId}`)
+    .row()
+    .text("see all todos", `todo:find-many-by-list-id_${listId}`)
+    .row()
     .text("delete", `list:delete_${listId}`)
     .row()
-    .text("exit", "convo:exit");
+    .text("return", "list:find-many");
 
   await ctx.reply("choose actions", {
     reply_markup: listActionsInlineKeyboard,

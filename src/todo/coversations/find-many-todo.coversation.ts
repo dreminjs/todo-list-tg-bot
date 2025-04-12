@@ -61,6 +61,6 @@ export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
   );
 
   await ctx.reply("choose todo for action", {
-    reply_markup: todosInlineKeyboard.text("exit", "convo:exit"),
+    reply_markup: todosInlineKeyboard.text("return", "list:find-many"),
   });
 }

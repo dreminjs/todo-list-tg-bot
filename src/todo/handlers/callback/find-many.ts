@@ -8,6 +8,7 @@ export const findManyCallback = async (
 ) => {
   await ctx.conversation.enter(findManyTodoConvo.name);
 };
+
 export const findManyByListIdCallback = async (
   ctx: CallbackQueryContext<CustomGeneralContext>,
 ) => {
@@ -40,10 +41,10 @@ export const findManyByListIdCallback = async (
       .row(),
   );
 
-  todosInlineKeyboard.text("exit", "convo:exit");
+  todosInlineKeyboard.text("return", "list:find-many");
 
   await ctx.reply("choose todo for action",{
-    reply_markup:todosInlineKeyboard
+    reply_markup: todosInlineKeyboard
   })
 
 };

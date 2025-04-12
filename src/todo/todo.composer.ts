@@ -17,7 +17,7 @@ todos.callbackQuery(/^todo:delete_([\w-]+)$/, deleteCallback);
 
 todos.callbackQuery("todo:find-many", findManyCallback);
 
-todos.callbackQuery(/^todo:find-many-by_([\w]+)$/, findManyByListIdCallback);
+todos.callbackQuery(/^todo:find-many-by-list-id_([\w-]+)$/, findManyByListIdCallback);
 
 todos.callbackQuery(/^todo:choose_([\w-]+)$/, chooseCallback);
 
