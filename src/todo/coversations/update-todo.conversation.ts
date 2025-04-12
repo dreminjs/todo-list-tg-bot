@@ -1,7 +1,6 @@
 import { Conversation } from "@grammyjs/conversations";
 import { Context } from "grammy";
 import { mainActionsKeyboard } from "../../app/shared/keyboards/main-actions.keyboard";
-import { updateOne } from "../todo.service";
 import { InlineKeyboard } from "grammy";
 import { handleEditField } from "../actions/update-todo.action";
 
