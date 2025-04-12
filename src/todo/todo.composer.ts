@@ -1,6 +1,6 @@
 import { Composer } from "grammy";
 import { CustomGeneralContext } from "../app/shared/interfaces";
-import { completeCallback } from "./handlers/callback/complete";
+import { toggleCompleteCallback } from "./handlers/callback/toggle-complete";
 import { editCallback } from "./handlers/callback/edit";
 import { deleteCallback } from "./handlers/callback/delete";
 import { findManyByListIdCallback, findManyCallback } from "./handlers/callback/find-many";
@@ -9,7 +9,7 @@ import { createCallback } from "./handlers/callback/create";
 
 export const todos = new Composer<CustomGeneralContext>();
 
-todos.callbackQuery(/^todo:complete_([\w-]+)$/, completeCallback)
+todos.callbackQuery(/^todo:toggle-complete_([\w-]+)$/, toggleCompleteCallback)
 
 todos.callbackQuery(/^todo:edit_([\w-]+)$/, editCallback);
 

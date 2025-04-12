@@ -56,7 +56,7 @@ export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
 
   todos.forEach((todo) =>
     todosInlineKeyboard
-      .text(todo.content.padStart(50), `todo:choose_${todo.id}`)
+      .text(todo.content, `todo:choose_${todo.id}`)
       .row(),
   );
 

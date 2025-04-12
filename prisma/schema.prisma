@@ -40,6 +40,7 @@ model Todo {
 model Step {
   id          String   @id @default(uuid()) @db.Uuid()
   content     String
+  complete    Boolean  @default(false)
   todoId      String   @db.Uuid()
   todo        Todo     @relation(references: [id],fields: [todoId], onDelete: Cascade)
   @@map("steps")

@@ -12,17 +12,20 @@ export const chooseCallback = async (
       id: todoId,
     },
     include: {
-      step: true,
       list: true,
     },
   });
+
+  const isCompletedLabel = choosedTodo?.complete ? "uncomplete" : "complete"
 
   const actionsKeyboard = new InlineKeyboard()
     .text("edit", `todo:edit_${todoId}`)
     .row()
     .text("delete", `todo:delete_${todoId}`)
     .row()
-    .text("complete", `todo:complete_${todoId}`)
+    .text(isCompletedLabel, `todo:toggle-complete_${todoId}`)
+    .row()
+    .text("see steps",`step:find-many-by-todo-id_${todoId}`)
     .row()
     .text("exit", "convo:exit");
 

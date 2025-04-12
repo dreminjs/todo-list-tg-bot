@@ -3,11 +3,14 @@ import { CustomGeneralContext } from "../../../app/shared/interfaces";
 import { findManyTodoConvo } from "../../coversations/find-many-todo.coversation";
 import { findMany } from "../../todo.service";
 
-
-export const findManyCallback = async (ctx: CallbackQueryContext<CustomGeneralContext>) => {
-    await ctx.conversation.enter(findManyTodoConvo.name);
- }
-export const findManyByListIdCallback = async (ctx: CallbackQueryContext<CustomGeneralContext>) => {
+export const findManyCallback = async (
+  ctx: CallbackQueryContext<CustomGeneralContext>,
+) => {
+  await ctx.conversation.enter(findManyTodoConvo.name);
+};
+export const findManyByListIdCallback = async (
+  ctx: CallbackQueryContext<CustomGeneralContext>,
+) => {
   const listId = ctx.match[1];
 
   const todos = await findMany({
@@ -18,14 +21,29 @@ export const findManyByListIdCallback = async (ctx: CallbackQueryContext<CustomG
     },
   });
 
+  if (todos.length === 0) {
+    const actionsInlineKeyboard = new InlineKeyboard()
+      .text("add todo!", "todo:create")
+      .row()
+      .text("exit", "convo:exit");
+
+   return await ctx.reply("u dont have any todos!", {
+      reply_markup: actionsInlineKeyboard,
+    });
+  }
+
   const todosInlineKeyboard = new InlineKeyboard();
 
   todos.forEach((todo) =>
     todosInlineKeyboard
-      .text(todo.content.padStart(50), `todo:choose_${todo.id}`)
+      .text(todo.content, `todo:choose_${todo.id}`)
       .row(),
-  );      
+  );
 
-  todosInlineKeyboard.text("exit","convo:exit")
-  
-}
+  todosInlineKeyboard.text("exit", "convo:exit");
+
+  await ctx.reply("choose todo for action",{
+    reply_markup:todosInlineKeyboard
+  })
+
+};

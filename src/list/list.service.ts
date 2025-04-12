@@ -26,3 +26,7 @@ export const updateOne = async (
     data,
   });
 };
+
+export async function findOne(args: Prisma.ListFindFirstArgs) {
+    return await prisma.list.findFirst(args)
+}

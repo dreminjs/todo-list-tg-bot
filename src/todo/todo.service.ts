@@ -1,5 +1,27 @@
 import { Prisma, Todo } from "@prisma/client";
 import { prisma } from "../prisma";
+import { deleteOne as deleteOneStep } from "../step/step.service";
+
+export const constOneFroStep = async ({
+  stepId,
+  listId,
+}: {
+  stepId: string;
+  listId: string;
+}): Promise<Todo> => {
+  const step = await deleteOneStep({ id: stepId });
+
+  const todo = await createOne({
+    content: step.content,
+    list: {
+      connect: {
+        id: listId,
+      },
+    },
+  });
+
+  return todo;
+};
 
 export const createOne = async (
   data: Prisma.TodoCreateInput,
@@ -8,7 +30,7 @@ export const createOne = async (
     data,
   });
 };
-            
+
 export const findMany = async (args: Prisma.TodoFindManyArgs) => {
   return await prisma.todo.findMany({ ...args });
 };

@@ -6,6 +6,7 @@ import { registerCommands } from "./app/commands/start";
 import { registerListModule } from "./list/list.module";
 import { registerTodoModule } from "./todo/todo.module";
 import { registerAppModule } from "./app/app.module";
+import { registerStepModule } from "./step/step.module";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ bot.use(conversations());
 registerAppModule(bot)
 registerTodoModule(bot)
 registerListModule(bot);
+registerStepModule(bot)
 registerCommands(bot);
 
 
