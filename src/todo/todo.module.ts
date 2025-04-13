@@ -4,7 +4,7 @@ import { createConversation } from "@grammyjs/conversations";
 import { findManyTodoConvo } from "./coversations/find-many-todo.coversation";
 import { todos } from "./todo.composer";
 import { createTodoConvo } from "./coversations/create-todo.conversation";
-import { editTodoConvo } from "./coversations/update-todo.conversation";
+import { editTodoConvo } from "./coversations/edit-todo.conversation";
 import { deleteTodoConvo } from "./coversations/delete-todo.conversation";
 
 export function registerTodoModule(bot: Bot<CustomGeneralContext>) {

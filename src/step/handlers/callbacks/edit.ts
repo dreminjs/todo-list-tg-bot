@@ -1,7 +1,7 @@
 import { CallbackQueryContext } from "grammy";
 import { CustomGeneralContext } from "../../../app/shared/interfaces";
-import { editTodoConvo } from "../../coversations/edit-todo.conversation";
+import { editStepConvo } from "../../conversations/edit-step.conversation";
 
 export const editCallback = async (ctx: CallbackQueryContext<CustomGeneralContext>) => {
-  await ctx.conversation.enter(editTodoConvo.name, ctx.match[1]);
-};
+    return await ctx.conversation.enter(editStepConvo.name,ctx.match[1])
+}   

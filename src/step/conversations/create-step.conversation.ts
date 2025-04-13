@@ -34,6 +34,7 @@ export const createStepConvo = async (
     reply_markup: handleShowStepActionsKeyboard({
       stepId: step.todoId,
       isComplete: step.complete,
+      todoId: step.todoId
     }),
   });
 };

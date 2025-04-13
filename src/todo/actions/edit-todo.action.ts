@@ -2,10 +2,10 @@ import { Context, InlineKeyboard } from "grammy";
 import { updateOne } from "../todo.service";
 import { Conversation } from "@grammyjs/conversations";
 
-const askContinueEditing = async (ctx: Context, convo: Conversation) => {
+const askContinueEditing = async (ctx: Context, convo: Conversation,todoId: string) => {
   const editConfirmationKeyboard = new InlineKeyboard()
     .text("yes", "todo:edit:yes")
-    .text("no", "todo:edit:no");
+    .text("no", `todo:edit:no`);
 
   await ctx.reply("Do you wanna continue editing?", {
     reply_markup: editConfirmationKeyboard,
@@ -47,5 +47,5 @@ export const handleEditField = async (
     }),
   ]);
 
-  return await askContinueEditing(ctx,convo);
+  return await askContinueEditing(ctx,convo,todoId);
 };

@@ -26,7 +26,7 @@ export const findManyByListIdCallback = async (
     const actionsInlineKeyboard = new InlineKeyboard()
       .text("add todo!", "todo:create")
       .row()
-      .text("exit", "convo:exit");
+      .text("return", "list:find-many");
 
    return await ctx.reply("u dont have any todos!", {
       reply_markup: actionsInlineKeyboard,

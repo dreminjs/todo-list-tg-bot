@@ -1,7 +1,8 @@
 import { Conversation } from "@grammyjs/conversations";
 import { Context, InlineKeyboard } from "grammy";
-import { mainActionsKeyboard } from "../../app/shared/keyboards/main-actions.keyboard";
-import { deleteOne } from "../todo.service";
+import { deleteOne, findOne } from "../todo.service";
+import { handleShowTodosInlineKeyboard } from "../keyboards/todos.inline-keyboard";
+import { handleShowtodoActionsInline } from "../keyboards/todo-actions.inline-keyboard";
 
 export const deleteTodoConvo = async (
   convo: Conversation,
@@ -20,10 +21,19 @@ export const deleteTodoConvo = async (
     callbackQuery: { data },
   } = await convo.waitForCallbackQuery(["todo:delete:yes", "todo:delete:no"]);
 
+  const currentTodo = await convo.external(() =>
+    findOne({ where: { id: todoId } }),
+  );
+
+  if (!currentTodo?.listId) return;
+
   if (data == "todo:delete:no") {
     await ctx.reply("Deletion is rejected");
-    return ctx.reply("Choose Action", {
-      reply_markup: mainActionsKeyboard,
+
+    return handleShowtodoActionsInline({
+      isComplete: Boolean(currentTodo?.complete),
+      todoId,
+      listId: currentTodo.listId,
     });
   }
 
@@ -33,8 +43,6 @@ export const deleteTodoConvo = async (
     deleteOne({
       id: todoId,
     }),
-    ctx.reply("Choose Action", {
-      reply_markup: mainActionsKeyboard,
-    }),
+    handleShowTodosInlineKeyboard({ convo, ctx, listId: currentTodo.listId }),
   ]);
 };

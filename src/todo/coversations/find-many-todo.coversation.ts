@@ -2,6 +2,7 @@ import { Conversation } from "@grammyjs/conversations";
 import { Context, InlineKeyboard } from "grammy";
 import { findMany as findManyLists } from "../../list";
 import { findMany } from "../todo.service";
+import { handleShowTodosInlineKeyboard } from "../keyboards/todos.inline-keyboard";
 
 export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
   const telegramId = ctx.chat?.id;
@@ -42,25 +43,9 @@ export async function findManyTodoConvo(convo: Conversation, ctx: Context) {
     callbackQuery: { data: listIdCallbackQueryAnswer },
   } = await convo.waitForCallbackQuery([...lists.map((el) => el.id)]);
 
-  const todos = await convo.external(() =>
-    findMany({
-      where: {
-        list: {
-          id: listIdCallbackQueryAnswer,
-        },
-      },
-    }),
-  );
-
-  const todosInlineKeyboard = new InlineKeyboard();
-
-  todos.forEach((todo) =>
-    todosInlineKeyboard
-      .text(todo.content, `todo:choose_${todo.id}`)
-      .row(),
-  );
-
-  await ctx.reply("choose todo for action", {
-    reply_markup: todosInlineKeyboard.text("return", "list:find-many"),
+  handleShowTodosInlineKeyboard({
+    convo,
+    listId: listIdCallbackQueryAnswer,
+    ctx,
   });
 }

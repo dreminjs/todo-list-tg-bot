@@ -3,10 +3,12 @@ import { InlineKeyboard } from "grammy";
 export const handleShowStepActionsKeyboard = ({
   isComplete,
   stepId,
+  todoId
 }: {
   stepId: string;
   isComplete: boolean;
-}) => {
+  todoId: string
+}): InlineKeyboard => {
 
   const isCompleteLabel = isComplete ? "uncomplete": "complete"
 
@@ -15,5 +17,5 @@ export const handleShowStepActionsKeyboard = ({
     .text(isCompleteLabel, `step:toggle-complete_${stepId}`).row()
     .text('delete',`step:delete_${stepId}`).row()
     .text("make task",`step:todo:create_${stepId}`).row()
-    .text("exit","convo:exit")
+    .text("return",`todo:choose_${todoId}`)
 };

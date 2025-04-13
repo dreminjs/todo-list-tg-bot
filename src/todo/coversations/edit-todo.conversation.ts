@@ -2,7 +2,7 @@ import { Conversation } from "@grammyjs/conversations";
 import { Context } from "grammy";
 import { mainActionsKeyboard } from "../../app/shared/keyboards/main-actions.keyboard";
 import { InlineKeyboard } from "grammy";
-import { handleEditField } from "../actions/update-todo.action";
+import { handleEditField } from "../actions/edit-todo.action";
 
 export async function editTodoConvo(
   convo: Conversation,
@@ -15,7 +15,7 @@ export async function editTodoConvo(
     const editTodoInlineKeyboard = new InlineKeyboard()
       .text("edit title", "todo:edit:title")
       .text("edit description", "todo:edit:description")
-      .text("exit", "convo:exit");
+      .text("return", `todo:choose_${todoId}`);
 
     await ctx.reply("Choose what you want to edit", {
       reply_markup: editTodoInlineKeyboard,
@@ -26,10 +26,7 @@ export async function editTodoConvo(
     } = await convo.waitForCallbackQuery([
       "todo:edit:title",
       "todo:edit:description",
-      "convo:exit",
     ]);
-
-    if (editTodoChoice === "convo:exit") break;
 
     switch (editTodoChoice) {
       case "todo:edit:title":

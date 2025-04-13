@@ -35,6 +35,7 @@ export const handleCreateSteps = async ({
         reply_markup: handleShowStepActionsKeyboard({
           stepId: todoId,
           isComplete: complete,
+          todoId
         }),
       });
     }

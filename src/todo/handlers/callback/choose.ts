@@ -1,4 +1,4 @@
-import { CallbackQueryContext, InlineKeyboard } from "grammy";
+import { CallbackQueryContext } from "grammy";
 import { CustomGeneralContext } from "../../../app/shared/interfaces";
 import { findOne } from "../../todo.service";
 import { handleShowtodoActionsInline } from "../../keyboards/todo-actions.inline-keyboard";
@@ -6,6 +6,9 @@ import { handleShowtodoActionsInline } from "../../keyboards/todo-actions.inline
 export const chooseCallback = async (
   ctx: CallbackQueryContext<CustomGeneralContext>,
 ) => {
+
+  await ctx.conversation.exitAll()
+
   const todoId = ctx.match[1];
 
   const choosedTodo = await findOne({

@@ -2,6 +2,7 @@ import { CallbackQueryContext } from "grammy";
 import { mainActionsKeyboard } from "../../../app/shared/keyboards/main-actions.keyboard";
 import { findOne, updateOne } from "../../todo.service";
 import { CustomGeneralContext } from "../../../app/shared/interfaces";
+import { handleShowtodoActionsInline } from "../../keyboards/todo-actions.inline-keyboard";
 
 export const toggleCompleteCallback = async (
   ctx: CallbackQueryContext<CustomGeneralContext>,
@@ -21,7 +22,13 @@ export const toggleCompleteCallback = async (
     },
   );
 
+  if(!completedTodo.listId) return;
+
   await ctx.reply(`${completedTodo.content} - completed! \nChoose Action!`, {
-    reply_markup: mainActionsKeyboard,
+    reply_markup:  handleShowtodoActionsInline({
+          isComplete: Boolean(completedTodo?.complete),
+          todoId,
+          listId: completedTodo?.listId
+        }),
   });
 };
