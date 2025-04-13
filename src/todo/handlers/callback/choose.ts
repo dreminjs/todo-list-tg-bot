@@ -22,15 +22,5 @@ export const chooseCallback = async (
 
   if(!choosedTodo?.listId) return ctx.reply("no list id!")
 
-  const textInfo = `name: ${choosedTodo?.content}${
-    choosedTodo?.description ? `\ndescription: ${choosedTodo?.description}` : ""
-  }\ncomplete: ${choosedTodo?.complete ? "✅" : "❌"}\n`;
-
-  return await ctx.reply(`${textInfo}`, {
-    reply_markup: handleShowtodoActionsInline({
-      isComplete: Boolean(choosedTodo?.complete),
-      todoId,
-      listId: choosedTodo?.listId
-    }),
-  });
+  return await handleShowtodoActionsInline({todo:choosedTodo,ctx})
 };

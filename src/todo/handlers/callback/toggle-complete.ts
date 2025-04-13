@@ -24,11 +24,5 @@ export const toggleCompleteCallback = async (
 
   if(!completedTodo.listId) return;
 
-  await ctx.reply(`${completedTodo.content} - completed! \nChoose Action!`, {
-    reply_markup:  handleShowtodoActionsInline({
-          isComplete: Boolean(completedTodo?.complete),
-          todoId,
-          listId: completedTodo?.listId
-        }),
-  });
+  return await handleShowtodoActionsInline({ ctx, todo: completedTodo });
 };

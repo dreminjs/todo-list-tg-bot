@@ -30,11 +30,7 @@ export const deleteTodoConvo = async (
   if (data == "todo:delete:no") {
     await ctx.reply("Deletion is rejected");
 
-    return handleShowtodoActionsInline({
-      isComplete: Boolean(currentTodo?.complete),
-      todoId,
-      listId: currentTodo.listId,
-    });
+    return await handleShowtodoActionsInline({ ctx, todo: currentTodo });
   }
 
   await ctx.reply("Todo deleted!");

@@ -42,3 +42,7 @@ export const findOne = async (
     where,
   });
 };
+
+export const count = async (args: Prisma.StepCountArgs): Promise<number> => {
+  return await prisma.step.count(args);
+};
