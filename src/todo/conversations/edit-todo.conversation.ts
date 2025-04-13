@@ -1,8 +1,9 @@
 import { Conversation } from "@grammyjs/conversations";
 import { Context } from "grammy";
-import { mainActionsKeyboard } from "../../app/shared/keyboards/main-actions.keyboard";
 import { InlineKeyboard } from "grammy";
 import { handleEditField } from "../actions/edit-todo.action";
+import { handleShowtodoActionsInline } from "../keyboards/todo-actions.inline-keyboard";
+import { findOne } from "../todo.service";
 
 export async function editTodoConvo(
   convo: Conversation,
@@ -50,7 +51,11 @@ export async function editTodoConvo(
     }
   }
 
-  await ctx.reply("Choose Action", {
-    reply_markup: mainActionsKeyboard,
-  });
+  const currentTodo = await convo.external(() =>
+    findOne({ where: { id: todoId } }),
+  );
+
+  if (!currentTodo) return;
+
+  handleShowtodoActionsInline({ ctx, todo: currentTodo });
 }

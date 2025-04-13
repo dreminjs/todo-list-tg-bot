@@ -1,60 +1,33 @@
 import { Conversation } from "@grammyjs/conversations";
-import { Context, InlineKeyboard } from "grammy";
+import { Context } from "grammy";
 import { createOne } from "../step.service";
-import { handleShowStepActionsKeyboard } from "../keyboards/step-actions.inline-keyboard";
+import { promptText } from "../../app/shared/prompts/prompt-text";
+import { promptConfirmAction } from "../../app/shared/prompts/prompt-confirm-action";
+import { mainActionsKeyboard } from "../../app/shared/keyboards/main-actions.keyboard";
 
-export const handleCreateSteps = async ({
-  isUserWantsContinue,
-  convo,
-  ctx,
-  todoId,
-  complete,
-}: {
-  isUserWantsContinue: boolean;
-  ctx: Context;
-  convo: Conversation;
-  todoId: string;
-  complete: boolean;
-}) => {
-  const stepInlineKeyboard = new InlineKeyboard()
-    .text("yes", "step:yes")
-    .text("no", "step:no");
+export async function handleStepsFlow(ctx: Context, convo: Conversation, todoId: string) {
+  let continueAdding = true;
 
-  while (isUserWantsContinue) {
-    await ctx.reply("do wanna add steps", {
-      reply_markup: stepInlineKeyboard,
-    });
+  while (continueAdding) {
+    const addStep = await promptConfirmAction({ctx, convo, message: "do wanna add steps", yesData:"step:yes",noData: "step:no"});
 
-    const {
-      callbackQuery: { data: stepChoice },
-    } = await convo.waitForCallbackQuery(["step:yes", "step:no"]);
-
-    if (stepChoice == "step:no") {
-      isUserWantsContinue = false;
-      return await ctx.reply("choose action", {
-        reply_markup: handleShowStepActionsKeyboard({
-          stepId: todoId,
-          isComplete: complete,
-          todoId
-        }),
-      });
+    if (!addStep) {
+      continueAdding = false;
+      break;
     }
 
-    await ctx.reply("write step!");
-
-    const { message: newStep } = await convo.waitFor(":text");
-
-    if (!newStep?.text) return;
-
-    await convo.external(() =>
-      createOne({
-        content: newStep.text,
-        todo: {
-          connect: {
-            id: todoId,
-          },
-        },
-      }),
-    );
+    const stepContent = await promptText(ctx, convo, "write step!");
+    if (stepContent) {
+      await convo.external(() =>
+        createOne({
+          content: stepContent,
+          todo: { connect: { id: todoId } },
+        })
+      );
+    }
   }
-};
+
+  await ctx.reply("choose action", {
+    reply_markup: mainActionsKeyboard,
+  });
+}

@@ -1,7 +1,9 @@
 import { Conversation } from "@grammyjs/conversations";
-import { createOne } from "../todo.service";
+import { createOne as createOneTodo } from "../todo.service";
 import { Prisma, Todo } from "@prisma/client";
 import { Context } from "grammy";
+import { promptText } from "../../app/shared/prompts/prompt-text";
+import { promptConfirmAction } from "../../app/shared/prompts/prompt-confirm-action";
 
 interface IArgs {
   convo: Conversation;
@@ -19,7 +21,7 @@ export const handleCreateTodo = async ({
   ctx,
 }: IArgs): Promise<Todo> => {
   const createdTodo = await convo.external(() =>
-    createOne({
+    createOneTodo({
       content: createTodoPayload.content,
       ...(createTodoPayload.description
         ? { description: createTodoPayload.description }
@@ -32,7 +34,7 @@ export const handleCreateTodo = async ({
     }),
   );
 
-   await Promise.all([
+  await Promise.all([
     ctx.api.setMessageReaction(chatId, messageId, [
       { type: "emoji", emoji: "👍" },
     ]),
@@ -43,5 +45,45 @@ export const handleCreateTodo = async ({
     }),
   ]);
 
-  return createdTodo
+  return createdTodo;
 };
+
+export async function handleTodoCreationFlow(
+  ctx: Context,
+  convo: Conversation,
+  listId: string,
+): Promise<string | null> {
+  const title = await promptText(ctx, convo, "write todo");
+  if (!title) return null;
+
+  const wantsDescription = await promptConfirmAction({
+    ctx,
+    convo,
+    message: "do you wanna add description?",
+    yesData: "todo:description:yes",
+    noData: "todo:description:no",
+  });
+
+  let todo;
+  if (wantsDescription) {
+    const description = await promptText(ctx, convo, "write description!");
+    if (!description) return null;
+
+    todo = await convo.external(() =>
+      createOneTodo({
+        content: title,
+        description,
+        list: { connect: { id: listId } },
+      }),
+    );
+  } else {
+    todo = await convo.external(() =>
+      createOneTodo({
+        content: title,
+        list: { connect: { id: listId } },
+      }),
+    );
+  }
+
+  return todo.id;
+}

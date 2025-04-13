@@ -1,6 +1,6 @@
 import { CallbackQueryContext, InlineKeyboard } from "grammy";
 import { CustomGeneralContext } from "../../../app/shared/interfaces";
-import { findManyTodoConvo } from "../../coversations/find-many-todo.coversation";
+import { findManyTodoConvo } from "../../conversations/find-many-todo.coversation";
 import { findMany } from "../../todo.service";
 
 export const findManyCallback = async (
