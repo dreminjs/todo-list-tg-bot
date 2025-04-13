@@ -23,3 +23,4 @@ todos.callbackQuery(/^todo:choose_([\w-]+)$/, chooseCallback);
 
 todos.callbackQuery("todo:create", createCallback);
 
+todos.callbackQuery(/^todo:create-by-step_([\w-]+)$/,)
